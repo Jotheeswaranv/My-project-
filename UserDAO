@@ -1,0 +1,43 @@
+public class User {
+    private int id;
+    private String username;
+    private String password;
+    private String email;
+    
+    // Getters and Setters
+}
+import java.sql.*;
+
+public class UserDAO {
+    private static final String URL = "jdbc:mysql://localhost:3306/gym_reservation";
+    private static final String USER = "root";
+    private static final String PASS = "password";
+
+    public boolean registerUser(User user) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASS)) {
+            String query = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, user.getEmail());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean loginUser(String username, String password) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASS)) {
+            String query = "SELECT * FROM users WHERE username = ? AND password = ?";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}
